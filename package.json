@@ -1,0 +1,21 @@
+{
+  "name": "americurn-feed-sync",
+  "version": "1.0.0",
+  "description": "Syncs variant color_v2 data from Shopify to a Google Sheet used as a GMC supplemental data source.",
+  "type": "module",
+  "main": "sync.mjs",
+  "scripts": {
+    "sync": "node sync.mjs",
+    "get-token": "node get-token.mjs",
+    "count": "node count.mjs"
+  },
+  "dependencies": {
+    "@shopify/admin-api-client": "^1.0.6",
+    "dotenv": "^16.4.5",
+    "googleapis": "^144.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}

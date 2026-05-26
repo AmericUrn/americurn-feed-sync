@@ -1,0 +1,43 @@
+name: Daily Color Sync
+
+on:
+  schedule:
+    # Daily at 08:00 UTC (~3am-4am Eastern depending on DST)
+    - cron: '0 8 * * *'
+  workflow_dispatch: # allow manual triggers from Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Write service account key
+        run: |
+          cat > service-account.json <<'EOF'
+          ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          EOF
+
+      - name: Run sync
+        env:
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_ACCESS_TOKEN: ${{ secrets.SHOPIFY_ACCESS_TOKEN }}
+          GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT_KEY: ./service-account.json
+        run: node sync.mjs
+
+      - name: Cleanup
+        if: always()
+        run: rm -f service-account.json
